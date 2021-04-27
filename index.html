@@ -40,22 +40,10 @@
     <div id="category-controls">
       <p>Degree of endangerment:</p>
     </div>
-    <div slider = "slidecontainer">
-      <input
-      type="range"
-      min="0"
-      max="200"
-      value="100"
-      step = "1"
-      class="slider"
-      id="myRange"
-    />
-    </div>
     <span id = "speakersValue"></span>
   </div>
 
   <script>
-
     const map1 = d3.select("svg#map1");
     const controls = d3.select("#controls");
     const chart = map1.append("g");
@@ -85,30 +73,21 @@
         .attr("d", path)
         .attr("fill", "none");
         
-      // Languages data
-      const data = await d3.csv("endangered-languages.csv");
-      console.log(data);
+      // Languages
+      const languages = await d3.csv("endangered-languages.csv");
+      console.log(languages);
 
-      // Filter data
-      data.forEach(d => {
-
-      });
-
-      data = data.filter((d) => {
-      
-      });
-
-      const categories = [...new Set(data.map(d => d["Degree of endangerment"]))];
+      const categories = [...new Set(languages.map(d => d["Degree of endangerment"]))];
 
       const colorScale = d3.scaleOrdinal()
         .domain(categories)
         .range(["#facb32", "#db820d", "#bf5900", "#bf0000", "#570000"]);
 
-      data.forEach(d => {
+      languages.forEach(d => {
         d.projCoords = proj([d.Longitude, d.Latitude]);
       });
 
-      chart.selectAll("circle.lang").data(data)
+      chart.selectAll("circle.lang").data(languages)
         .join("circle")
         .attr("class", "lang")
         .attr("r", 2)
@@ -148,8 +127,6 @@
             d3.select(this).attr("visibility", "");
           });
         });
-    
-      // Create new SVG for number of speakers
     }
 
     requestData();
