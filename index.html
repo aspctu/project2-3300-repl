@@ -40,8 +40,19 @@
     <div id="category-controls">
       <p>Degree of endangerment:</p>
     </div>
-    <span id = "speakersValue"></span>
   </div>
+  <div slider = "slidecontainer">
+    <input
+    type="range"
+    min="0"
+    max="1000000"
+    value="100"
+    step = "100"
+    class="slider"
+    id="myRange"
+  />
+  </div>
+  <span id = "speakersValue"></span>
 
   <script>
     const map1 = d3.select("svg#map1");
@@ -74,8 +85,24 @@
         .attr("fill", "none");
         
       // Languages
-      const languages = await d3.csv("endangered-languages.csv");
+      let languages = await d3.csv("endangered-languages.csv");
       console.log(languages);
+
+      // Check data types and filter languages data
+      languages.forEach(d => {
+        d['Number of speakers'] = Number(d['Number of speakers']);
+      });
+
+      console.log(languages);
+
+      languages = languages.filter(d => {
+        return d['Number of speakers'] >= 0 
+        && d['Degree of endangerment'] != "" && d['Degree of endangerment'] != null
+        && d['Name in English'] != "" && d['Name in English'] != null
+      });
+
+      console.log(languages);
+
 
       const categories = [...new Set(languages.map(d => d["Degree of endangerment"]))];
 
@@ -95,7 +122,8 @@
         .attr("fill", d => colorScale(d["Degree of endangerment"]))
         .attr("cx", d => d.projCoords[0])
         .attr("cy", d => d.projCoords[1])
-        .attr("category", d => d["Degree of endangerment"]);
+        .attr("category", d => d["Degree of endangerment"])
+        .attr("speakers", d => d["Number of speakers"]);
 
       const categoryControls = d3.select("#category-controls");
 
@@ -127,6 +155,38 @@
             d3.select(this).attr("visibility", "");
           });
         });
+
+
+      // Speakers slider
+
+    //   var slider = document.getElementById("myRange")
+
+    //   const speakers = [...new Set(languages.map(d => d["Number of speakers"]))];
+
+    //   function showCircles(s) {
+    //     speakers.forEach((d, i) => {
+    //     chart.selectAll("circle").
+    //     each(function () {
+    //       let circle = d3.select(this);
+    //           if (circle.attr("speakers") === d) {
+    //             circle.attr("visibility", "")
+    //           } else {
+    //             circle.attr("visibility", "hidden");
+    //           }
+    //         });
+    //       });
+    //   };
+    //   showCircles(100)
+
+    //   var speakersValue = d3.select("#speakersValue")
+    //       .append("span")
+    //       .text("Speakers: 100")
+    //       .style("color", "black")
+
+    //   slider.oninput = function() {
+    //     showCircles(this.value);
+    //     speakersValue.text("Speakers: " + this.value);
+    // }
     }
 
     requestData();
