@@ -17,8 +17,14 @@
       justify-content: center;
     }
 
+		#category-controls-label {
+			font-size: 20px;
+		}
+
     #category-controls {
       width: fit-content;
+			margin-bottom: 10px;
+			margin-left: 3px;
     }
 
     #category-controls p {
@@ -31,28 +37,45 @@
       margin: 2px 0px;
       width: 150px;
     }
+
+		#wrapperForSVGandFilters {
+			display: flex; 
+			flex-direction: row;
+		}
+
+		#wrapperForFiltersandControlandPanels {
+			display: flex;
+			flex-direction: column;
+			border: .5px solid grey;
+		}
   </style>
 </head>
 
 <body>
-  <svg id="map1" height="600" width="1000" style="margin:20px"></svg>
-  <div id="controls">
-    <div id="category-controls">
-      <p>Degree of endangerment:</p>
-    </div>
-  </div>
-  <div slider = "slidecontainer">
-    <input
-    type="range"
-    min="0"
-    max="1000000"
-    value="100"
-    step = "100"
-    class="slider"
-    id="myRange"
-  />
-  </div>
-  <span id = "speakersValue"></span>
+	<div id="wrapperForSVGandFilters">
+		<svg id="map1" height="600" width="1000" style="margin:20px"></svg>
+		<div id="wrapperForFiltersandControlandPanels">
+			<div id="controls">
+				<div id="category-controls">
+					<p id="category-controls-label">Degree of endangerment:</p>
+				</div>
+  		</div>
+			<div slider = "slidecontainer">
+				<p id="category-controls-label">Slider:</p>
+				<input
+				type="range"
+				min="0"
+				max="1000000"
+				value="100"
+				step = "100"
+				class="slider"
+				id="myRange"
+			/>
+  		<span id = "speakersValue"></span>
+			<p id="category-controls-label">Hover label</p>
+			<div id="div_template"</div>
+		</div>
+	</div>
 
   <script>
     const map1 = d3.select("svg#map1");
@@ -123,7 +146,35 @@
         .attr("cx", d => d.projCoords[0])
         .attr("cy", d => d.projCoords[1])
         .attr("category", d => d["Degree of endangerment"])
-        .attr("speakers", d => d["Number of speakers"]);
+        .attr("speakers", d => d["Number of speakers"])
+				.attr("country", d => d["Name in English"])
+				.on("mouseover", function(evt) {		
+					tooltip.style("opacity", 1)
+    			d3.select(this)
+      			.style("stroke", "black")
+      			.style("opacity", 1)
+  				})
+				.on("mousemove", function(evt) {
+					let circle = d3.select(this);
+					let location = d3.pointer(evt)
+					tooltip
+		      	.html(
+							"Language: " + (circle.attr("country")) + "<br/>" +
+							"Category of endangerment: " + (circle.attr("category")) + "<br/>" +
+							"Number of remaining speakers: " +  circle.attr("speakers") + "<br/>" 
+
+							
+							)	
+      			//.style("left", (location[0]+70) + "px")
+      			//.style("top", (location[1]) + "px")
+					})
+				.on("mouseout", function(evt) {
+					tooltip.transition()		
+						.duration(500)		
+						.style("opacity", 0);	
+					d3.select(this)
+						.style("stroke", "")
+				})
 
       const categoryControls = d3.select("#category-controls");
 
@@ -156,6 +207,17 @@
           });
         });
 
+
+			// create a tooltip
+			var tooltip = d3.select("#div_template")
+				.append("div")
+				.style("opacity", 0)
+				.attr("class", "tooltip")
+				.style("background-color", "white")
+				.style("border", "solid")
+				.style("border-width", "2px")
+				.style("border-radius", "5px")
+				.style("padding", "5px")
 
       // Speakers slider
 
