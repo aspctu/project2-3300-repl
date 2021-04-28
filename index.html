@@ -47,6 +47,8 @@
 			display: flex;
 			flex-direction: column;
 			border: .5px solid grey;
+			background-color: white;
+			z-index:1000000;
 		}
   </style>
 </head>
@@ -162,8 +164,6 @@
 							"Language: " + (circle.attr("country")) + "<br/>" +
 							"Category of endangerment: " + (circle.attr("category")) + "<br/>" +
 							"Number of remaining speakers: " +  circle.attr("speakers") + "<br/>" 
-
-							
 							)	
       			//.style("left", (location[0]+70) + "px")
       			//.style("top", (location[1]) + "px")
@@ -218,6 +218,10 @@
 				.style("border-width", "2px")
 				.style("border-radius", "5px")
 				.style("padding", "5px")
+
+			map1.call(d3.zoom().on("zoom", function (evt) {
+       map1.attr("transform", evt.transform)
+    }))
 
       // Speakers slider
 
