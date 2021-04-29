@@ -36,6 +36,7 @@
       padding: 2px 5px;
       margin: 2px 0px;
       width: 150px;
+      cursor: pointer;
     }
 
     #wrapperForSVGandFilters {
@@ -61,9 +62,14 @@
         </div>
       </div>
       <div slider="slidecontainer">
-        <p id="category-controls-label">Slider:</p>
-        <input type="range" min="0" max="1000000" value="100" step="100" class="slider" id="myRange" />
-        <span id="speakersValue"></span>
+        <p id="category-controls-label">Min # Speakers:</p>
+        <input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
+        <span id="speakersValueMin"></span>
+
+        <p id="category-controls-label">Max # Speakers:</p>
+        <input type="range" min="0" max="1000000" value="1000000" step="100" class="slider" id="myRangeMax" />
+        <span id="speakersValueMax"></span>
+
         <p id="category-controls-label">Hover label</p>
         <div id="div_template" </div>
         </div>
@@ -109,14 +115,12 @@
 
           // Languages
           let languages = await d3.csv("endangered-languages.csv");
-          console.log(languages);
 
           // Check data types and filter languages data
           languages.forEach(d => {
             d['Number of speakers'] = Number(d['Number of speakers']);
           });
 
-          console.log(languages);
 
           languages = languages.filter(d => {
             return d['Number of speakers'] >= 0
@@ -204,9 +208,11 @@
                 chart.selectAll("circle").each(function () {
                   let circle = d3.select(this);
                   if (circle.attr("category") === s) {
-                    circle.attr("visibility", "")
+                    circle.attr("visibility", "");
+                    circle.attr("active", true);
                   } else {
                     circle.attr("visibility", "hidden");
+                    circle.attr("active", false);
                   }
                 });
               });
@@ -220,6 +226,7 @@
             .on("mouseover", function () {
               chart.selectAll("circle").each(function () {
                 d3.select(this).attr("visibility", "");
+                d3.select(this).attr("active", true);
               });
             });
 
@@ -235,36 +242,46 @@
             .style("border-radius", "5px")
             .style("padding", "5px")
 
-          // Speakers slider
+          const sliderMin = d3.select("#myRangeMin");
+          const sliderMax = d3.select("#myRangeMax");
 
-          //   var slider = document.getElementById("myRange")
+          let currentMin = 0;
+          let currentMax = 1000000;
 
-          //   const speakers = [...new Set(languages.map(d => d["Number of speakers"]))];
+          function showCircles() {
+            chart.selectAll("circle").
+              each(function () {
+                let circle = d3.select(this);
+                if (circle.attr("active") === "true" && circle.attr("speakers") >= currentMin && circle.attr("speakers") <= currentMax) {
+                  circle.attr("visibility", "")
+                } else {
+                  circle.attr("visibility", "hidden");
+                }
+              });
+          };
 
-          //   function showCircles(s) {
-          //     speakers.forEach((d, i) => {
-          //     chart.selectAll("circle").
-          //     each(function () {
-          //       let circle = d3.select(this);
-          //           if (circle.attr("speakers") === d) {
-          //             circle.attr("visibility", "")
-          //           } else {
-          //             circle.attr("visibility", "hidden");
-          //           }
-          //         });
-          //       });
-          //   };
-          //   showCircles(100)
+          var speakersValueMin = d3.select("#speakersValueMin")
+            .append("span")
+            .text("0")
+            .style("color", "black");
 
-          //   var speakersValue = d3.select("#speakersValue")
-          //       .append("span")
-          //       .text("Speakers: 100")
-          //       .style("color", "black")
+          var speakersValueMax = d3.select("#speakersValueMax")
+            .append("span")
+            .text("1000000")
+            .style("color", "black");
 
-          //   slider.oninput = function() {
-          //     showCircles(this.value);
-          //     speakersValue.text("Speakers: " + this.value);
-          // }
+          sliderMin.on("input", function (e) {
+            currentMin = Number(e.target.value);
+            showCircles();
+            speakersValueMin.text(this.value);
+          });
+
+          sliderMax.on("input", function (e) {
+            currentMax = Number(e.target.value);
+            showCircles();
+            speakersValueMax.text(this.value);
+          });
+
         }
 
         requestData();
