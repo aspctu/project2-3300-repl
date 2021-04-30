@@ -10,6 +10,20 @@
   </script>
 
   <style>
+    .intro {
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .header {
+      font-size: 96px;
+      font-weight: bolder;
+      margin-bottom: 5px;
+    }
+
+    body {
+      font-family: Helvetica;
+    }
     path.country-outline {
       stroke: #999;
       stroke-width: 1;
@@ -22,44 +36,57 @@
     }
 
     #category-controls-label {
-      font-size: 20px;
+      font-size: 18px;
       margin-top: 3px;
     }
 
     #category-controls {
       width: fit-content;
-      margin-right: 10px;
+      margin-right: auto;
+      margin-left: auto;
     }
 
     #category-controls p {
       margin: 3px;
+      text-align: left;
     }
 
 
     #category-controls p.category {
       border-radius: 20px;
-      padding: 2px 5px;
+      padding: 5px 7px;
       margin: 2px 0px;
-      width: 150px;
+      width: 200px;
       cursor: pointer;
     }
 
     #wrapperForSVGandFilters {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
     }
 
     #wrapperForFiltersandControlandPanels {
       display: flex;
-      flex-direction: row;
-      border: .5px solid grey;
+      flex-direction: column;
+      border: .5px solid lightgrey;
+      width: 200px;
+      padding: 10px 10px;
+      border-radius: 5px;
     }
   </style>
 </head>
 
 <body>
+  <div class="intro">
+    <h1 class="header">ENDANGERED LANGUAGES</h1>
+    <h1><em>Degree of Endangerment of Endangered Languages Around the World</em></h1>
+    <p><em>What trends can be infer from looking at worldwide endangered languages, their country of origin, and their level of endangerment?</em> 
+      
+    </p>
+  </div>
+
   <div id="wrapperForSVGandFilters">
-    <svg id="map1" height="600" width="1000" style="margin:20px"></svg>
+    <svg id="map1" height="600" width="1300" style="margin:20px"></svg>
     <div id="wrapperForFiltersandControlandPanels">
       <div id="controls">
         <div id="category-controls">
@@ -68,16 +95,16 @@
       </div>
       <div slider="slidecontainer">
 
-        <p id="category-controls-label">Min # Speakers:</p>
+        <p id="category-controls-label"><br/>Mininum Number of Speakers:</p>
         <input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
         <span id="speakersValueMin"></span>
 
-        <p id="category-controls-label">Max # Speakers:</p>
+        <p id="category-controls-label"><br/>Maximum Number of Speakers:</p>
         <input type="range" min="0" max="1000000" value="1000000" step="100" class="slider" id="myRangeMax" />
         <span id="speakersValueMax"></span>
       </div>
       <div>
-        <p id="category-controls-label">Hover label</p>
+        <p id="category-controls-label"><br/>Hover Details</p>
         <div id="div_template"></div>
       </div>
     </div>
