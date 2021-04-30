@@ -24,6 +24,7 @@
     body {
       font-family: Helvetica;
     }
+
     path.country-outline {
       stroke: #999;
       stroke-width: 1;
@@ -104,7 +105,6 @@
         <span id="speakersValueMax"></span>
       </div>
       <div>
-        <p id="category-controls-label"><br/>Hover Details</p>
         <div id="div_template"></div>
       </div>
     </div>
@@ -222,16 +222,13 @@
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
-          //.style("left", (location[0]+70) + "px")
-          //.style("top", (location[1]) + "px")
         })
         .on("mouseout", function (evt) {
           countries.features.forEach(country => {
             country.active = false;
           });
           renderCountries();
-          tooltip.transition()
-            .style("opacity", 0);
+          tooltip.style("opacity", 0);
           d3.select(this)
             .style("stroke", "")
         })
