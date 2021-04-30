@@ -19,17 +19,18 @@
 
     #category-controls-label {
       font-size: 20px;
+			margin-top: 3px;
     }
 
     #category-controls {
       width: fit-content;
-      margin-bottom: 10px;
-      margin-left: 3px;
+			margin-right: 10px;
     }
 
     #category-controls p {
       margin: 3px;
     }
+
 
     #category-controls p.category {
       border-radius: 20px;
@@ -41,12 +42,12 @@
 
     #wrapperForSVGandFilters {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
     }
 
     #wrapperForFiltersandControlandPanels {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       border: .5px solid grey;
     }
   </style>
@@ -62,16 +63,19 @@
         </div>
       </div>
       <div slider="slidecontainer">
-        <p id="category-controls-label">Min # Speakers:</p>
-        <input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
-        <span id="speakersValueMin"></span>
+
+				<p id="category-controls-label">Min # Speakers:</p>
+				<input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
+				<span id="speakersValueMin"></span>
 
         <p id="category-controls-label">Max # Speakers:</p>
         <input type="range" min="0" max="1000000" value="1000000" step="100" class="slider" id="myRangeMax" />
         <span id="speakersValueMax"></span>
-
+      </div>
+			<div>
         <p id="category-controls-label">Hover label</p>
         <div id="div_template" </div>
+			</div>
         </div>
       </div>
 
