@@ -1,68 +1,72 @@
 <html>
 
 <head>
-  <title>3300 Project 2</title>
-  <script src="https://d3js.org/d3.v6.min.js"></script>
-  <script src="https://d3js.org/topojson.v3.min.js"></script>
+	<title>3300 Project 2</title>
+	<script src="https://d3js.org/d3.v6.min.js">
 
-  <style>
-    path.country-outline {
-      stroke: #999;
-      stroke-width: 1;
-    }
+	</script>
+	<script src="https://d3js.org/topojson.v3.min.js">
 
-    #controls {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-    }
+	</script>
 
-    #category-controls-label {
-      font-size: 20px;
+	<style>
+		path.country-outline {
+			stroke: #999;
+			stroke-width: 1;
+		}
+
+		#controls {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+		}
+
+		#category-controls-label {
+			font-size: 20px;
 			margin-top: 3px;
-    }
+		}
 
-    #category-controls {
-      width: fit-content;
+		#category-controls {
+			width: fit-content;
 			margin-right: 10px;
-    }
+		}
 
-    #category-controls p {
-      margin: 3px;
-    }
+		#category-controls p {
+			margin: 3px;
+		}
 
 
-    #category-controls p.category {
-      border-radius: 20px;
-      padding: 2px 5px;
-      margin: 2px 0px;
-      width: 150px;
-      cursor: pointer;
-    }
+		#category-controls p.category {
+			border-radius: 20px;
+			padding: 2px 5px;
+			margin: 2px 0px;
+			width: 150px;
+			cursor: pointer;
+		}
 
-    #wrapperForSVGandFilters {
-      display: flex;
-      flex-direction: column;
-    }
+		#wrapperForSVGandFilters {
+			display: flex;
+			flex-direction: column;
+		}
 
-    #wrapperForFiltersandControlandPanels {
-      display: flex;
-      flex-direction: row;
-      border: .5px solid grey;
-    }
-  </style>
+		#wrapperForFiltersandControlandPanels {
+			display: flex;
+			flex-direction: row;
+			border: .5px solid grey;
+		}
+	</style>
 </head>
 
 <body>
-  <div id="wrapperForSVGandFilters">
-    <svg id="map1" height="600" width="1000" style="margin:20px"></svg>
-    <div id="wrapperForFiltersandControlandPanels">
-      <div id="controls">
-        <div id="category-controls">
-          <p id="category-controls-label">Degree of endangerment:</p>
-        </div>
-      </div>
-      <div slider="slidecontainer">
+	<div id="wrapperForSVGandFilters">
+		<svg id="map1" height="600" width="1000" style="margin:20px"></svg>
+		<div id="wrapperForFiltersandControlandPanels">
+			<div id="controls">
+				<div id="category-controls">
+					<p id="category-controls-label">Degree of endangerment:</p>
+				</div>
+			</div>
+			<div slider="slidecontainer">
 
 				<p id="category-controls-label">Min # Speakers:</p>
 				<input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
@@ -240,38 +244,20 @@
             });
 
 					// Zoom section 
-
-					// then, create the zoom behvavior
+					// Adapted from https://stackoverflow.com/questions/55987499/prevent-panning-outside-of-map-bounds-in-d3v5
 					var zoom = d3.zoom()
-					// only scale up, e.g. between 1x and 50x
 					.scaleExtent([1, 50])
 					.on("zoom", function(evt) {
-						// the "zoom" event populates d3.event with an object that has
-						// a "translate" property (a 2-element Array in the form [x, y])
-						// and a numeric "scale" property
 						var e = evt.transform,
-							// now, constrain the x and y components of the translation by the
-							// dimensions of the viewport
 							tx = Math.min(0, Math.max(e.x, width - width * e.k)),
 							ty = Math.min(0, Math.max(e.y, height - height * e.k));
-						// then, update the zoom behavior's internal translation, so that
-						// it knows how to properly manipulate it on the next movement
-						// and finally, update the <g> element's transform attribute with the
-						// correct translation and scale (in reverse order)
 						chart.attr("transform", [
 							"translate(" + [tx, ty] + ")",
 							"scale(" + e.k + ")"
 						].join(" "));
 					});
-
-    // then, call the zoom behavior on the svg element, which will add
-    // all of the necessary mouse and touch event handlers.
-    // remember that if you call this on the <g> element, the even handlers
-    // will only trigger when the mouse or touch cursor intersects with the
-    // <g> elements' children!
-    chart.call(zoom);
-
-
+    			chart.call(zoom);
+					
           // create a tooltip
           var tooltip = d3.select("#div_template")
             .append("div")
