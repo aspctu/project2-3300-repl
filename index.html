@@ -17,246 +17,316 @@
       justify-content: center;
     }
 
-		#category-controls-label {
-			font-size: 20px;
-		}
+    #category-controls-label {
+      font-size: 20px;
+			margin-top: 3px;
+    }
 
     #category-controls {
       width: fit-content;
-			margin-bottom: 10px;
-			margin-left: 3px;
+			margin-right: 10px;
     }
 
     #category-controls p {
       margin: 3px;
     }
 
+
     #category-controls p.category {
       border-radius: 20px;
       padding: 2px 5px;
       margin: 2px 0px;
       width: 150px;
+      cursor: pointer;
     }
 
-		#wrapperForSVGandFilters {
-			display: flex; 
-			flex-direction: row;
-		}
+    #wrapperForSVGandFilters {
+      display: flex;
+      flex-direction: column;
+    }
 
-		#wrapperForFiltersandControlandPanels {
-			display: flex;
-			flex-direction: column;
-			border: .5px solid grey;
-			background-color: white;
-			z-index:1000000;
-		}
+    #wrapperForFiltersandControlandPanels {
+      display: flex;
+      flex-direction: row;
+      border: .5px solid grey;
+    }
   </style>
 </head>
 
 <body>
-	<div id="wrapperForSVGandFilters">
-		<svg id="map1" height="600" width="1000" style="margin:20px"></svg>
-		<div id="wrapperForFiltersandControlandPanels">
-			<div id="controls">
-				<div id="category-controls">
-					<p id="category-controls-label">Degree of endangerment:</p>
-				</div>
-  		</div>
-			<div slider = "slidecontainer">
-				<p id="category-controls-label">Slider:</p>
-				<input
-				type="range"
-				min="0"
-				max="1000000"
-				value="100"
-				step = "100"
-				class="slider"
-				id="myRange"
-			/>
-  		<span id = "speakersValue"></span>
-			<p id="category-controls-label">Hover label</p>
-			<div id="div_template"</div>
-		</div>
-	</div>
+  <div id="wrapperForSVGandFilters">
+    <svg id="map1" height="600" width="1000" style="margin:20px"></svg>
+    <div id="wrapperForFiltersandControlandPanels">
+      <div id="controls">
+        <div id="category-controls">
+          <p id="category-controls-label">Degree of endangerment:</p>
+        </div>
+      </div>
+      <div slider="slidecontainer">
 
-  <script>
-    const map1 = d3.select("svg#map1");
-    const controls = d3.select("#controls");
-    const chart = map1.append("g");
+				<p id="category-controls-label">Min # Speakers:</p>
+				<input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
+				<span id="speakersValueMin"></span>
 
-    const height = map1.attr("height");
-    const width = map1.attr("width");
+        <p id="category-controls-label">Max # Speakers:</p>
+        <input type="range" min="0" max="1000000" value="1000000" step="100" class="slider" id="myRangeMax" />
+        <span id="speakersValueMax"></span>
+      </div>
+			<div>
+        <p id="category-controls-label">Hover label</p>
+        <div id="div_template" </div>
+			</div>
+        </div>
+      </div>
 
-    async function requestData() {
-      
-      // dataset without Antarctica
-      const mapData = await d3.json("countries-110m.json");
+      <script>
+        const map1 = d3.select("svg#map1");
+        const controls = d3.select("#controls");
+        const chart = map1.append("g");
 
-      const countries = topojson.feature(mapData, mapData.objects.countries1);
-      const countriesMesh = topojson.mesh(mapData, mapData.objects.countries1);
+        const height = map1.attr("height");
+        const width = map1.attr("width");
 
-      const proj = d3.geoNaturalEarth1().fitSize([width, height], countries);
-      const path = d3.geoPath().projection(proj);
+        async function requestData() {
 
-      chart.selectAll("path.country").data(countries.features)
-        .join("path")
-        .attr("class", "country")
-        .attr("fill", "#eee")
-        .attr("d", path)
+          // dataset without Antarctica
+          const mapData = await d3.json("countries-110m.json");
 
-      chart.append("path").datum(countriesMesh)
-        .attr("class", "country-outline")
-        .attr("d", path)
-        .attr("fill", "none");
-        
-      // Languages
-      let languages = await d3.csv("endangered-languages.csv");
-      console.log(languages);
+          const countries = topojson.feature(mapData, mapData.objects.countries1);
+          const countriesMesh = topojson.mesh(mapData, mapData.objects.countries1);
 
-      // Check data types and filter languages data
-      languages.forEach(d => {
-        d['Number of speakers'] = Number(d['Number of speakers']);
-      });
+          const proj = d3.geoNaturalEarth1().fitSize([width, height], countries);
+          const path = d3.geoPath().projection(proj);
 
-      console.log(languages);
+          countries.features.forEach(d => {
+            d.active = false;
+          });
 
-      languages = languages.filter(d => {
-        return d['Number of speakers'] >= 0 
-        && d['Degree of endangerment'] != "" && d['Degree of endangerment'] != null
-        && d['Name in English'] != "" && d['Name in English'] != null
-      });
+          function renderCountries() {
+            chart.selectAll("path.country").data(countries.features)
+              .join("path")
+              .attr("class", "country")
+              .attr("fill", d => d.active ? "#87d9ff" : "#eee")
+              .attr("d", path)
+          }
 
-      console.log(languages);
+          renderCountries();
+
+          chart.append("path").datum(countriesMesh)
+            .attr("class", "country-outline")
+            .attr("d", path)
+            .attr("fill", "none");
+
+          // Languages
+          let languages = await d3.csv("endangered-languages.csv");
+
+          // Check data types and filter languages data
+          languages.forEach(d => {
+            d['Number of speakers'] = Number(d['Number of speakers']);
+          });
+
+          languages = languages.filter(d => {
+            return d['Number of speakers'] >= 0
+              && d['Degree of endangerment'] != "" && d['Degree of endangerment'] != null
+              && d['Name in English'] != "" && d['Name in English'] != null
+          });
+
+          console.log(languages);
 
 
-      const categories = [...new Set(languages.map(d => d["Degree of endangerment"]))];
+          const categories = [...new Set(languages.map(d => d["Degree of endangerment"]))];
 
-      const colorScale = d3.scaleOrdinal()
-        .domain(categories)
-        .range(["#facb32", "#db820d", "#bf5900", "#bf0000", "#570000"]);
+          const colorScale = d3.scaleOrdinal()
+            .domain(categories)
+            .range(["#facb32", "#db820d", "#bf5900", "#bf0000", "#570000"]);
 
-      languages.forEach(d => {
-        d.projCoords = proj([d.Longitude, d.Latitude]);
-      });
+          languages.forEach(d => {
+            d.projCoords = proj([d.Longitude, d.Latitude]);
+          });
 
-      chart.selectAll("circle.lang").data(languages)
-        .join("circle")
-        .attr("class", "lang")
-        .attr("r", 2)
-        .attr("opacity", 0.7)
-        .attr("fill", d => colorScale(d["Degree of endangerment"]))
-        .attr("cx", d => d.projCoords[0])
-        .attr("cy", d => d.projCoords[1])
-        .attr("category", d => d["Degree of endangerment"])
-        .attr("speakers", d => d["Number of speakers"])
-				.attr("country", d => d["Name in English"])
-				.on("mouseover", function(evt) {		
-					tooltip.style("opacity", 1)
-    			d3.select(this)
-      			.style("stroke", "black")
-      			.style("opacity", 1)
-  				})
-				.on("mousemove", function(evt) {
-					let circle = d3.select(this);
-					let location = d3.pointer(evt)
-					tooltip
-		      	.html(
-							"Language: " + (circle.attr("country")) + "<br/>" +
-							"Category of endangerment: " + (circle.attr("category")) + "<br/>" +
-							"Number of remaining speakers: " +  circle.attr("speakers") + "<br/>" 
-							)	
-      			//.style("left", (location[0]+70) + "px")
-      			//.style("top", (location[1]) + "px")
-					})
-				.on("mouseout", function(evt) {
-					tooltip.transition()		
-						.duration(500)		
-						.style("opacity", 0);	
-					d3.select(this)
-						.style("stroke", "")
-				})
+          chart.selectAll("circle.lang").data(languages)
+            .join("circle")
+            .attr("class", "lang")
+            .attr("r", 3)
+            .attr("opacity", 0.7)
+            .attr("fill", d => colorScale(d["Degree of endangerment"]))
+            .attr("cx", d => d.projCoords[0])
+            .attr("cy", d => d.projCoords[1])
+            .attr("category", d => d["Degree of endangerment"])
+            .attr("speakers", d => d["Number of speakers"])
+            .attr("country", d => d["Name in English"])
+            .attr("codes", d => d["Country codes alpha 3"].split(", "))
+            .attr("active", true)
+            .on("mouseover", function (evt) {
+              let countryCodes = d3.select(this).attr("codes");
+              countries.features.forEach(country => {
+                if (countryCodes.includes(country.id)) {
+                  country.active = true;
+                } else {
+                  country.active = false;
+                }
+              });
+              renderCountries();
 
-      const categoryControls = d3.select("#category-controls");
+              tooltip.style("opacity", 1)
+              d3.select(this)
+                .style("stroke", "black")
+                .style("opacity", 1)
 
-      categories.forEach((s, i) => {
-        categoryControls.append("p")
-          .text(s)
-          .attr("class", "category")
-          .style("background-color", colorScale(s))
-          .style("color", i > 1 ? "white" : "black")
-          .on("mouseover", function () {
-            chart.selectAll("circle").each(function () {
+							 let circle = d3.select(this);
+              let location = d3.pointer(evt)
+              tooltip
+                .html(
+                  "Language: " + (circle.attr("country")) + "<br/>" +
+                  "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
+                  "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
+                )
+            })
+            .on("mousemove", function (evt) {
               let circle = d3.select(this);
-              if (circle.attr("category") === s) {
-                circle.attr("visibility", "")
-              } else {
-                circle.attr("visibility", "hidden");
-              }
+              let location = d3.pointer(evt)
+              tooltip
+                .html(
+                  "Language: " + (circle.attr("country")) + "<br/>" +
+                  "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
+                  "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
+                )
+              //.style("left", (location[0]+70) + "px")
+              //.style("top", (location[1]) + "px")
+            })
+            .on("mouseout", function (evt) {
+              countries.features.forEach(country => {
+                country.active = false;
+              });
+              renderCountries();
+              tooltip.transition()
+                .style("opacity", 0);
+              d3.select(this)
+                .style("stroke", "")
+            })
+
+          const categoryControls = d3.select("#category-controls");
+
+          categories.forEach((s, i) => {
+            categoryControls.append("p")
+              .text(s)
+              .attr("class", "category")
+              .style("background-color", colorScale(s))
+              .style("color", i > 1 ? "white" : "black")
+              .on("mouseover", function () {
+                chart.selectAll("circle").each(function () {
+                  let circle = d3.select(this);
+                  if (circle.attr("category") === s) {
+                    circle.attr("visibility", "");
+                    circle.attr("active", true);
+                  } else {
+                    circle.attr("visibility", "hidden");
+                    circle.attr("active", false);
+                  }
+                });
+              });
+          });
+
+          categoryControls.append("p")
+            .text("All")
+            .attr("class", "category")
+            .style("background-color", "black")
+            .style("color", "white")
+            .on("mouseover", function () {
+              chart.selectAll("circle").each(function () {
+                d3.select(this).attr("visibility", "");
+                d3.select(this).attr("active", true);
+              });
             });
+
+					// Zoom section 
+
+					// then, create the zoom behvavior
+					var zoom = d3.zoom()
+					// only scale up, e.g. between 1x and 50x
+					.scaleExtent([1, 50])
+					.on("zoom", function(evt) {
+						// the "zoom" event populates d3.event with an object that has
+						// a "translate" property (a 2-element Array in the form [x, y])
+						// and a numeric "scale" property
+						var e = evt.transform,
+							// now, constrain the x and y components of the translation by the
+							// dimensions of the viewport
+							tx = Math.min(0, Math.max(e.x, width - width * e.k)),
+							ty = Math.min(0, Math.max(e.y, height - height * e.k));
+						// then, update the zoom behavior's internal translation, so that
+						// it knows how to properly manipulate it on the next movement
+						// and finally, update the <g> element's transform attribute with the
+						// correct translation and scale (in reverse order)
+						chart.attr("transform", [
+							"translate(" + [tx, ty] + ")",
+							"scale(" + e.k + ")"
+						].join(" "));
+					});
+
+    // then, call the zoom behavior on the svg element, which will add
+    // all of the necessary mouse and touch event handlers.
+    // remember that if you call this on the <g> element, the even handlers
+    // will only trigger when the mouse or touch cursor intersects with the
+    // <g> elements' children!
+    chart.call(zoom);
+
+
+          // create a tooltip
+          var tooltip = d3.select("#div_template")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+
+          const sliderMin = d3.select("#myRangeMin");
+          const sliderMax = d3.select("#myRangeMax");
+
+          let currentMin = 0;
+          let currentMax = 1000000;
+
+          function showCircles() {
+            chart.selectAll("circle").
+              each(function () {
+                let circle = d3.select(this);
+                if (circle.attr("active") === "true" && circle.attr("speakers") >= currentMin && circle.attr("speakers") <= currentMax) {
+                  circle.attr("visibility", "")
+                } else {
+                  circle.attr("visibility", "hidden");
+                }
+              });
+          };
+
+          var speakersValueMin = d3.select("#speakersValueMin")
+            .append("span")
+            .text("0")
+            .style("color", "black");
+
+          var speakersValueMax = d3.select("#speakersValueMax")
+            .append("span")
+            .text("1000000")
+            .style("color", "black");
+
+          sliderMin.on("input", function (e) {
+            currentMin = Number(e.target.value);
+            showCircles();
+            speakersValueMin.text(this.value);
           });
-      });
 
-      categoryControls.append("p")
-        .text("All")
-        .attr("class", "category")
-        .style("background-color", "black")
-        .style("color", "white")
-        .on("mouseover", function () {
-          chart.selectAll("circle").each(function () {
-            d3.select(this).attr("visibility", "");
+          sliderMax.on("input", function (e) {
+            currentMax = Number(e.target.value);
+            showCircles();
+            speakersValueMax.text(this.value);
           });
-        });
 
+        }
 
-			// create a tooltip
-			var tooltip = d3.select("#div_template")
-				.append("div")
-				.style("opacity", 0)
-				.attr("class", "tooltip")
-				.style("background-color", "white")
-				.style("border", "solid")
-				.style("border-width", "2px")
-				.style("border-radius", "5px")
-				.style("padding", "5px")
-
-			map1.call(d3.zoom().on("zoom", function (evt) {
-       map1.attr("transform", evt.transform)
-    }))
-
-      // Speakers slider
-
-    //   var slider = document.getElementById("myRange")
-
-    //   const speakers = [...new Set(languages.map(d => d["Number of speakers"]))];
-
-    //   function showCircles(s) {
-    //     speakers.forEach((d, i) => {
-    //     chart.selectAll("circle").
-    //     each(function () {
-    //       let circle = d3.select(this);
-    //           if (circle.attr("speakers") === d) {
-    //             circle.attr("visibility", "")
-    //           } else {
-    //             circle.attr("visibility", "hidden");
-    //           }
-    //         });
-    //       });
-    //   };
-    //   showCircles(100)
-
-    //   var speakersValue = d3.select("#speakersValue")
-    //       .append("span")
-    //       .text("Speakers: 100")
-    //       .style("color", "black")
-
-    //   slider.oninput = function() {
-    //     showCircles(this.value);
-    //     speakersValue.text("Speakers: " + this.value);
-    // }
-    }
-
-    requestData();
-  </script>
+        requestData();
+      </script>
 </body>
 
 </html>
