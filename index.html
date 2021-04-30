@@ -120,6 +120,11 @@
 
     async function requestData() {
 
+      // used for filtering
+      var currentCategory = "All";
+      var currentMin = 0;
+      var currentMax = 1000000;
+
       // dataset without Antarctica
       const mapData = await d3.json("countries-110m.json");
 
@@ -244,16 +249,8 @@
           .style("background-color", colorScale(s))
           .style("color", i > 1 ? "white" : "black")
           .on("mouseover", function () {
-            chart.selectAll("circle").each(function () {
-              let circle = d3.select(this);
-              if (circle.attr("category") === s) {
-                circle.attr("visibility", "");
-                circle.attr("active", true);
-              } else {
-                circle.attr("visibility", "hidden");
-                circle.attr("active", false);
-              }
-            });
+            currentCategory = s;
+            showCircles();
           });
       });
 
@@ -263,10 +260,6 @@
         .style("background-color", "black")
         .style("color", "white")
         .on("mouseover", function () {
-          chart.selectAll("circle").each(function () {
-            d3.select(this).attr("visibility", "");
-            d3.select(this).attr("active", true);
-          });
         });
 
       // Zoom section 
@@ -300,14 +293,17 @@
       const sliderMin = d3.select("#myRangeMin");
       const sliderMax = d3.select("#myRangeMax");
 
-      let currentMin = 0;
-      let currentMax = 1000000;
-
+      // shows dots based on current filter settings
+      // call this function after changing any filters
       function showCircles() {
         chart.selectAll("circle").
           each(function () {
             let circle = d3.select(this);
-            if (circle.attr("active") === "true" && circle.attr("speakers") >= currentMin && circle.attr("speakers") <= currentMax) {
+            let categoryCond = circle.attr("category") === currentCategory || currentCategory === "All";
+            if (circle.attr("speakers") >= currentMin &&
+              circle.attr("speakers") <= currentMax &&
+              categoryCond
+            ) {
               circle.attr("visibility", "")
             } else {
               circle.attr("visibility", "hidden");
