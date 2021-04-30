@@ -185,8 +185,9 @@
         .attr("cy", d => d.projCoords[1])
         .attr("category", d => d["Degree of endangerment"])
         .attr("speakers", d => d["Number of speakers"])
-        .attr("country", d => d["Name in English"])
+        .attr("name", d => d["Name in English"])
         .attr("codes", d => d["Country codes alpha 3"].split(", "))
+        .attr("country", d => d["Countries"])
         .attr("active", true)
         .on("mouseover", function (evt) {
           let countryCodes = d3.select(this).attr("codes");
@@ -208,7 +209,7 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("country")) + "<br/>" +
+              "Language: " + (circle.attr("name")) + "<br/>" +
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
@@ -218,7 +219,8 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("country")) + "<br/>" +
+              "Language: " + (circle.attr("name")) + "<br/>" +
+              "Spoken in: " + circle.attr("country") + "<br/>" +
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
