@@ -271,14 +271,16 @@
       // Adapted from https://stackoverflow.com/questions/55987499/prevent-panning-outside-of-map-bounds-in-d3v5
       var zoom = d3.zoom()
         .scaleExtent([1, 50])
-        .on("zoom", function (evt) {
-          var e = evt.transform,
-            tx = Math.min(0, Math.max(e.x, width - width * e.k)),
-            ty = Math.min(0, Math.max(e.y, height - height * e.k));
-          chart.attr("transform", [
-            "translate(" + [tx, ty] + ")",
-            "scale(" + e.k + ")"
-          ].join(" "));
+        .on("zoom", function ({ transform }) {
+          chart.attr("transform", transform);
+
+          chart.select(".country-outline")
+            .style("stroke-width", 1 / transform.k);
+
+          let r = 3 / transform.k;
+          chart.selectAll("circle.lang")
+            .attr("r", r < 0.5 ? r * 1.5 : r)
+            .attr("stroke-width", 1 / transform.k);
         });
       chart.call(zoom);
 
