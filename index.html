@@ -260,6 +260,8 @@
         .style("background-color", "black")
         .style("color", "white")
         .on("mouseover", function () {
+          currentCategory = "All";
+          showCircles();
         });
 
       // Zoom section 
@@ -278,6 +280,29 @@
             .attr("stroke-width", 1 / transform.k);
         });
       chart.call(zoom);
+
+      chart.selectAll(".country").on("click", clicked);
+
+      // from lecture on 4/28
+      function clicked(evt, d) {
+
+        let bounds = path.bounds(d.geometry);
+        let dx = bounds[1][0] - bounds[0][0];
+        let dy = bounds[1][1] - bounds[0][1];
+        let x = (bounds[0][0] + bounds[1][0]) / 2;
+        let y = (bounds[0][1] + bounds[1][1]) / 2;
+
+        let scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx / width,
+          dy / height)));
+
+        let translate = [width / 2 - x * scale, height / 2 - y * scale];
+
+        let newTransform = d3.zoomIdentity
+          .translate(translate[0], translate[1])
+          .scale(scale);
+
+        chart.transition().duration(1000).call(zoom.transform, newTransform);
+      }
 
       // create a tooltip
       var tooltip = d3.select("#div_template")
