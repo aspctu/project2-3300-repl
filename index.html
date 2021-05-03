@@ -223,6 +223,7 @@
         .join("circle")
         .attr("class", "lang")
         .attr("r", 3)
+        .attr("k", 1)
         .attr("opacity", 0.7)
         .attr("fill", d => colorScale(d["Degree of endangerment"]))
         .attr("cx", d => d.projCoords[0])
@@ -244,10 +245,17 @@
           });
           renderCountries();
 
-          tooltip.style("opacity", 1)
+          tooltip.style("opacity", 1);
+
+          let r = 8 / d3.select(this).attr("k");
           d3.select(this)
             .style("stroke", "black")
             .style("opacity", 1)
+
+          d3.select(this).raise()
+            .transition().duration(300)
+            .attr("r", r)
+            .attr("opacity", 1);
 
           let circle = d3.select(this);
           let location = d3.pointer(evt)
@@ -268,10 +276,6 @@
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
-            d3.select(this).raise()
-              .transition().duration(300)
-              .attr("r", 8)
-              .attr("opacity", 1);
         })
         .on("mouseout", function (evt) {
           countries.features.forEach(country => {
@@ -279,10 +283,11 @@
           });
           renderCountries();
           tooltip.style("opacity", 0);
+          let r = 3 / d3.select(this).attr("k");
           d3.select(this)
             .style("stroke", "")
             .transition().duration(300)
-            .attr("r", 3)
+            .attr("r", r < 0.5 ? r * 1.5 : r)
             .attr("opacity", 0.7);
         })
 
@@ -322,6 +327,7 @@
 
           let r = 3 / transform.k;
           chart.selectAll("circle.lang")
+            .attr("k", transform.k)
             .attr("r", r < 0.5 ? r * 1.5 : r)
             .attr("stroke-width", 1 / transform.k);
         });
