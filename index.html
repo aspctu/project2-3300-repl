@@ -12,7 +12,8 @@
   <style>
     .intro {
       max-width: 1400px;
-      margin: auto;
+      margin: auto auto;
+      margin-bottom: 1px;
     }
 
     .header {
@@ -64,6 +65,7 @@
     #wrapperForSVGandFilters {
       display: flex;
       flex-direction: row;
+      margin: auto auto;
     }
 
     #wrapperForFiltersandControlandPanels {
@@ -71,6 +73,7 @@
       flex-direction: column;
       border: .5px solid lightgrey;
       width: 250px;
+      margin-top: 40px;
       padding: 15px 15px;
       border-radius: 5px;
     }
@@ -86,8 +89,8 @@
     <h1 class="header">ENDANGERED LANGUAGES</h1>
     <h1><em>Degree of Endangerment of Endangered Languages Around the World</em></h1>
     <p><em>What trends can be infer from looking at worldwide endangered languages, their country of origin, and their level of endangerment?</em> 
-		<p id="muted">Pinch to zoom over land mass on map. Click and drag to pan</p>
-		<p id="muted">Double click on landmass to Zoom and view country info</p>
+		<p id="muted">Pinch to zoom over land mass on map. Click and drag to pan.</p>
+		<p id="muted">Click on a landmass to Zoom and view country info.</p>
     </p>
   </div>
 
@@ -222,7 +225,7 @@
       chart.selectAll("circle.lang").data(languages)
         .join("circle")
         .attr("class", "lang")
-        .attr("r", 3)
+        .attr("r", 4)
         .attr("k", 1)
         .attr("opacity", 0.7)
         .attr("fill", d => colorScale(d["Degree of endangerment"]))
@@ -283,12 +286,12 @@
           });
           renderCountries();
           tooltip.style("opacity", 0);
-          let r = 3 / d3.select(this).attr("k");
+          let r = 4 / d3.select(this).attr("k");
           d3.select(this)
-            .style("stroke", "")
             .transition().duration(300)
             .attr("r", r < 0.5 ? r * 1.5 : r)
-            .attr("opacity", 0.7);
+            .style("stroke", "")
+            .style("opacity", 0.7);
         })
 
       const categoryControls = d3.select("#category-controls");
@@ -325,7 +328,7 @@
           chart.select(".country-outline")
             .style("stroke-width", 1 / transform.k);
 
-          let r = 3 / transform.k;
+          let r = 4 / transform.k;
           chart.selectAll("circle.lang")
             .attr("k", transform.k)
             .attr("r", r < 0.5 ? r * 1.5 : r)
