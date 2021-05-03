@@ -237,7 +237,7 @@
         .attr("codes", d => d["Country codes alpha 3"].split(", "))
         .attr("country", d => d["Countries"])
         .attr("active", true)
-        .on("mouseover", function (evt) {
+        .on("mouseover", function (evt, d) {
           let countryCodes = d3.select(this).attr("codes");
           countries.features.forEach(country => {
             if (countryCodes.includes(country.id)) {
@@ -268,6 +268,26 @@
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
+					console.log(d)
+					console.log(evt)
+					console.log(circle)
+					let total = highLevelCountryData[d["Country codes alpha 3"]]["total"]	
+					let vulnerablePercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Vulnerable"] / total) * 100)	
+					let dEndangeredPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Definitely endangered"] / total) * 100)	
+					let sEndangeredPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Severely endangered"] / total) * 100)	
+					let cEndagneredPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Critically endangered"] / total) * 100)	
+					let extinctPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Extinct"] / total) * 100)	
+					countryPanel	
+						.html(	
+							"Country: " + (d["Country codes alpha 3"]) + "<br/>" +	
+							"Vulnerable: " + vulnerablePercentage + "%" + "<br/>" +	
+							"Definitely endangered: " + dEndangeredPercentage + "%" + "<br/>" +	
+							"Severely endangered: " + sEndangeredPercentage + "%" + "<br/>" +	
+							"Critically endangered: " + cEndagneredPercentage + "%" + "<br/>" +	
+							"Extinct: " + extinctPercentage + "%"	
+						)	
+					countryPanel.style("opacity", 1)
+
         })
         .on("mousemove", function (evt) {
           let circle = d3.select(this);
@@ -286,6 +306,7 @@
           });
           renderCountries();
           tooltip.style("opacity", 0);
+					countryPanel.style("opacity", 0);
           let r = 4 / d3.select(this).attr("k");
           d3.select(this)
             .transition().duration(300)
@@ -357,24 +378,6 @@
           .scale(scale);
 
         chart.transition().duration(1000).call(zoom.transform, newTransform);
-				let country = d3.select(this);	
-				let total = highLevelCountryData[d["id"]]["total"]	
-				let vulnerablePercentage = Math.round((highLevelCountryData[d["id"]]["Vulnerable"] / total) * 100)	
-				let dEndangeredPercentage = Math.round((highLevelCountryData[d["id"]]["Definitely endangered"] / total) * 100)	
-				let sEndangeredPercentage = Math.round((highLevelCountryData[d["id"]]["Severely endangered"] / total) * 100)	
-				let cEndagneredPercentage = Math.round((highLevelCountryData[d["id"]]["Critically endangered"] / total) * 100)	
-				let extinctPercentage = Math.round((highLevelCountryData[d["id"]]["Extinct"] / total) * 100)	
-				countryPanel	
-					.html(	
-						"Country: " + (d["id"]) + "<br/>" +	
-						"Vulnerable: " + vulnerablePercentage + "%" + "<br/>" +	
-						"Definitely endangered: " + dEndangeredPercentage + "%" + "<br/>" +	
-						"Severely endangered: " + sEndangeredPercentage + "%" + "<br/>" +	
-						"Critically endangered: " + cEndagneredPercentage + "%" + "<br/>" +	
-						"Extinct: " + extinctPercentage + "%"	
-					)	
-				countryPanel.style("opacity", 1)
-
       }
 			// create a tooltip for the country information	
       var countryPanel = d3.select("#countryPanel")	
