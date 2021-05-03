@@ -72,7 +72,7 @@
       display: flex;
       flex-direction: column;
       border: .5px solid lightgrey;
-      width: 250px;
+      width: 300px;
       margin-top: 40px;
       padding: 15px 15px;
       border-radius: 5px;
@@ -80,6 +80,22 @@
 
 		#muted {
 			color: gray;
+		}
+
+		#label {
+			font-weight: bold;
+			margin-bottom: 0px;
+			margin-right: 2px;
+		}
+
+		#rowWrapper{
+			display: flex; 
+			flex-direction: row;
+			margin-bottom: 0px;
+		}
+
+		#div_template{
+			margin-bottom: 2px;
 		}
   </style>
 </head>
@@ -264,10 +280,11 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("name")) + "<br/>" +
-              "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
-              "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
-            )
+              '<div id="rowWrapper"> <div id="label"> Language: </div>' + (circle.attr("name")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Spoken in: </div>' + (circle.attr("country")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Endangerment level: </div>' + (circle.attr("category")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Remaining speaker count: </div>' + (circle.attr("speakers")) + "</div>"
+					)
 
 					let total = highLevelCountryData[d["Country codes alpha 3"]]["total"]	
 					let vulnerablePercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Vulnerable"] / total) * 100)	
@@ -277,12 +294,12 @@
 					let extinctPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Extinct"] / total) * 100)	
 					countryPanel	
 						.html(	
-							"Country: " + (d["Country codes alpha 3"]) + "<br/>" +	
-							"Vulnerable: " + vulnerablePercentage + "%" + "<br/>" +	
-							"Definitely endangered: " + dEndangeredPercentage + "%" + "<br/>" +	
-							"Severely endangered: " + sEndangeredPercentage + "%" + "<br/>" +	
-							"Critically endangered: " + cEndagneredPercentage + "%" + "<br/>" +	
-							"Extinct: " + extinctPercentage + "%"	
+							'<div id="rowWrapper"> <div id="label"> Country: </div>' + (d["Country codes alpha 3"]) + " </div>" +	
+							'<div id="rowWrapper"> <div id="label"> Vulnerable: </div> ' + vulnerablePercentage + "%" + "</div> " +	
+							'<div id="rowWrapper"> <div id="label"> Definitely endangered: </div> ' + dEndangeredPercentage + "%" + "</div>" +	
+							'<div id="rowWrapper"> <div id="label"> Severely endangered: </div> ' + sEndangeredPercentage + "%" + "</div>" +	
+							'<div id="rowWrapper"> <div id="label">Critically endangered: </div> ' + cEndagneredPercentage + "%" + "</div>" +	
+							'<div id="rowWrapper"> <div id="label"> Extinct: </div> ' + extinctPercentage + "%"	+ "</div>"
 						)	
 					countryPanel.style("opacity", 1)
 
@@ -292,11 +309,11 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("name")) + "<br/>" +
-              "Spoken in: " + circle.attr("country") + "<br/>" +
-              "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
-              "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
-            )
+              '<div id="rowWrapper"> <div id="label"> Language: </div>' + (circle.attr("name")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Spoken in: </div>' + (circle.attr("country")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Endangerment level: </div>' + (circle.attr("category")) + "</div>" +
+              '<div id="rowWrapper"> <div id="label"> Remaining speaker count: </div>' + (circle.attr("speakers")) + "</div>"
+					)
         })
         .on("mouseout", function (evt) {
           countries.features.forEach(country => {
