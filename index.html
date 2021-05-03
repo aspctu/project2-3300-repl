@@ -108,6 +108,9 @@
       <div>
         <div id="div_template"></div>
       </div>
+			<div>
+				<div id="countryPanel"></div>
+			</div>
     </div>
   </div>
 
@@ -175,6 +178,27 @@
           && d['Name in English'] != "" && d['Name in English'] != null
         }
       });
+
+			highLevelCountryData = {}	
+			languages.forEach(d => {	
+				d["Country codes alpha 3"].split(',').forEach(code => {	
+					let c = code.trim()	
+					if (c in highLevelCountryData) {	
+						highLevelCountryData[c]["total"] += 1	
+						highLevelCountryData[c][d['Degree of endangerment']] += 1	
+					}	
+					else {	
+						highLevelCountryData[c] = {}	
+						highLevelCountryData[c]["total"] = 1	
+						highLevelCountryData[c]["Vulnerable"] = 0	
+						highLevelCountryData[c]["Definitely endangered"] = 0	
+						highLevelCountryData[c]["Critically endangered"] = 0	
+						highLevelCountryData[c]["Severely endangered"] = 0	
+						highLevelCountryData[c]["Extinct"] = 0	
+						highLevelCountryData[c][d["Degree of endangerment"]] += 1	
+					}	
+				})	
+			})
 
 
       console.log(languages);
@@ -319,7 +343,35 @@
           .scale(scale);
 
         chart.transition().duration(1000).call(zoom.transform, newTransform);
+				let country = d3.select(this);	
+				let total = highLevelCountryData[d["id"]]["total"]	
+				let vulnerablePercentage = Math.round((highLevelCountryData[d["id"]]["Vulnerable"] / total) * 100)	
+				let dEndangeredPercentage = Math.round((highLevelCountryData[d["id"]]["Definitely endangered"] / total) * 100)	
+				let sEndangeredPercentage = Math.round((highLevelCountryData[d["id"]]["Severely endangered"] / total) * 100)	
+				let cEndagneredPercentage = Math.round((highLevelCountryData[d["id"]]["Critically endangered"] / total) * 100)	
+				let extinctPercentage = Math.round((highLevelCountryData[d["id"]]["Extinct"] / total) * 100)	
+				countryPanel	
+					.html(	
+						"Country: " + (d["id"]) + "<br/>" +	
+						"Vulnerable: " + vulnerablePercentage + "%" + "<br/>" +	
+						"Definitely endangered: " + dEndangeredPercentage + "%" + "<br/>" +	
+						"Severely endangered: " + sEndangeredPercentage + "%" + "<br/>" +	
+						"Critically endangered: " + cEndagneredPercentage + "%" + "<br/>" +	
+						"Extinct: " + extinctPercentage + "%"	
+					)	
+				countryPanel.style("opacity", 1)
+
       }
+			// create a tooltip for the country information	
+      var countryPanel = d3.select("#countryPanel")	
+        .append("div")	
+        .style("opacity", 0)	
+        .attr("class", "tooltip")	
+        .style("background-color", "white")
+        .style("border", "solid")	
+        .style("border-width", "2px")	
+        .style("border-radius", "5px")	
+        .style("padding", "5px")
 
       // create a tooltip
       var tooltip = d3.select("#div_template")
