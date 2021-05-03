@@ -157,16 +157,25 @@
       // Languages
       let languages = await d3.csv("endangered-languages.csv");
 
+      console.log(languages);
+
       // Check data types and filter languages data
       languages.forEach(d => {
         d['Number of speakers'] = Number(d['Number of speakers']);
       });
 
       languages = languages.filter(d => {
-        return d['Number of speakers'] >= 0
+        if (d['Degree of endangerment'] != "Extinct") {
+          return d['Number of speakers'] > 0
           && d['Degree of endangerment'] != "" && d['Degree of endangerment'] != null
           && d['Name in English'] != "" && d['Name in English'] != null
+        } else {
+          return d['Number of speakers'] >= 0
+          && d['Degree of endangerment'] != "" && d['Degree of endangerment'] != null
+          && d['Name in English'] != "" && d['Name in English'] != null
+        }
       });
+
 
       console.log(languages);
 
@@ -230,6 +239,10 @@
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
+            d3.select(this).raise()
+              .transition().duration(300)
+              .attr("r", 8)
+              .attr("opacity", 1);
         })
         .on("mouseout", function (evt) {
           countries.features.forEach(country => {
@@ -239,6 +252,9 @@
           tooltip.style("opacity", 0);
           d3.select(this)
             .style("stroke", "")
+            .transition().duration(300)
+            .attr("r", 3)
+            .attr("opacity", 0.7);
         })
 
       const categoryControls = d3.select("#category-controls");
