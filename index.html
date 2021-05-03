@@ -121,6 +121,11 @@
 
     async function requestData() {
 
+      // used for filtering
+      var currentCategory = "All";
+      var currentMin = 0;
+      var currentMax = 1000000;
+
       // dataset without Antarctica
       const mapData = await d3.json("countries-110m.json");
 
@@ -186,8 +191,9 @@
         .attr("cy", d => d.projCoords[1])
         .attr("category", d => d["Degree of endangerment"])
         .attr("speakers", d => d["Number of speakers"])
-        .attr("country", d => d["Name in English"])
+        .attr("name", d => d["Name in English"])
         .attr("codes", d => d["Country codes alpha 3"].split(", "))
+        .attr("country", d => d["Countries"])
         .attr("active", true)
         .on("mouseover", function (evt) {
           let countryCodes = d3.select(this).attr("codes");
@@ -209,7 +215,7 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("country")) + "<br/>" +
+              "Language: " + (circle.attr("name")) + "<br/>" +
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
@@ -219,7 +225,8 @@
           let location = d3.pointer(evt)
           tooltip
             .html(
-              "Language: " + (circle.attr("country")) + "<br/>" +
+              "Language: " + (circle.attr("name")) + "<br/>" +
+              "Spoken in: " + circle.attr("country") + "<br/>" +
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
@@ -243,16 +250,8 @@
           .style("background-color", colorScale(s))
           .style("color", i > 1 ? "white" : "black")
           .on("mouseover", function () {
-            chart.selectAll("circle").each(function () {
-              let circle = d3.select(this);
-              if (circle.attr("category") === s) {
-                circle.attr("visibility", "");
-                circle.attr("active", true);
-              } else {
-                circle.attr("visibility", "hidden");
-                circle.attr("active", false);
-              }
-            });
+            currentCategory = s;
+            showCircles();
           });
       });
 
@@ -262,26 +261,49 @@
         .style("background-color", "black")
         .style("color", "white")
         .on("mouseover", function () {
-          chart.selectAll("circle").each(function () {
-            d3.select(this).attr("visibility", "");
-            d3.select(this).attr("active", true);
-          });
+          currentCategory = "All";
+          showCircles();
         });
 
       // Zoom section 
       // Adapted from https://stackoverflow.com/questions/55987499/prevent-panning-outside-of-map-bounds-in-d3v5
       var zoom = d3.zoom()
         .scaleExtent([1, 50])
-        .on("zoom", function (evt) {
-          var e = evt.transform,
-            tx = Math.min(0, Math.max(e.x, width - width * e.k)),
-            ty = Math.min(0, Math.max(e.y, height - height * e.k));
-          chart.attr("transform", [
-            "translate(" + [tx, ty] + ")",
-            "scale(" + e.k + ")"
-          ].join(" "));
+        .on("zoom", function ({ transform }) {
+          chart.attr("transform", transform);
+
+          chart.select(".country-outline")
+            .style("stroke-width", 1 / transform.k);
+
+          let r = 3 / transform.k;
+          chart.selectAll("circle.lang")
+            .attr("r", r < 0.5 ? r * 1.5 : r)
+            .attr("stroke-width", 1 / transform.k);
         });
       chart.call(zoom);
+
+      chart.selectAll(".country").on("click", clicked);
+
+      // from lecture on 4/28
+      function clicked(evt, d) {
+
+        let bounds = path.bounds(d.geometry);
+        let dx = bounds[1][0] - bounds[0][0];
+        let dy = bounds[1][1] - bounds[0][1];
+        let x = (bounds[0][0] + bounds[1][0]) / 2;
+        let y = (bounds[0][1] + bounds[1][1]) / 2;
+
+        let scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx / width,
+          dy / height)));
+
+        let translate = [width / 2 - x * scale, height / 2 - y * scale];
+
+        let newTransform = d3.zoomIdentity
+          .translate(translate[0], translate[1])
+          .scale(scale);
+
+        chart.transition().duration(1000).call(zoom.transform, newTransform);
+      }
 
       // create a tooltip
       var tooltip = d3.select("#div_template")
@@ -297,14 +319,17 @@
       const sliderMin = d3.select("#myRangeMin");
       const sliderMax = d3.select("#myRangeMax");
 
-      let currentMin = 0;
-      let currentMax = 1000000;
-
+      // shows dots based on current filter settings
+      // call this function after changing any filters
       function showCircles() {
         chart.selectAll("circle").
           each(function () {
             let circle = d3.select(this);
-            if (circle.attr("active") === "true" && circle.attr("speakers") >= currentMin && circle.attr("speakers") <= currentMax) {
+            let categoryCond = circle.attr("category") === currentCategory || currentCategory === "All";
+            if (circle.attr("speakers") >= currentMin &&
+              circle.attr("speakers") <= currentMax &&
+              categoryCond
+            ) {
               circle.attr("visibility", "")
             } else {
               circle.attr("visibility", "hidden");
