@@ -265,9 +265,7 @@
               "Category of endangerment: " + (circle.attr("category")) + "<br/>" +
               "Number of remaining speakers: " + circle.attr("speakers") + "<br/>"
             )
-					console.log(d)
-					console.log(evt)
-					console.log(circle)
+
 					let total = highLevelCountryData[d["Country codes alpha 3"]]["total"]	
 					let vulnerablePercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Vulnerable"] / total) * 100)	
 					let dEndangeredPercentage = Math.round((highLevelCountryData[d["Country codes alpha 3"]]["Definitely endangered"] / total) * 100)	
