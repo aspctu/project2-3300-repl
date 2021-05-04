@@ -121,12 +121,12 @@
       </div>
       <div slider="slidecontainer">
 
-        <p id="category-controls-label"><br/>Mininum Number of Speakers:</p>
-        <input type="range" min="0" max="1000000" value="0" step="100" class="slider" id="myRangeMin" />
+        <p id="category-controls-label"><br />Mininum Number of Speakers:</p>
+        <input type="range" min="0" max="20" value="0" step="1" class="slider" id="myRangeMin" />
         <span id="speakersValueMin"></span>
 
-        <p id="category-controls-label"><br/>Maximum Number of Speakers:</p>
-        <input type="range" min="0" max="1000000" value="1000000" step="100" class="slider" id="myRangeMax" />
+        <p id="category-controls-label"><br />Maximum Number of Speakers:</p>
+        <input type="range" min="0" max="20" value="20" step="1" class="slider" id="myRangeMax" />
         <span id="speakersValueMax"></span>
       </div>
       <br/>
@@ -449,15 +449,19 @@
         .style("color", "black");
 
       sliderMin.on("input", function (e) {
-        currentMin = Number(e.target.value);
+        const curr = Number(e.target.value);
+        const exp = curr === 0 ? 0 : Math.ceil(Math.pow(2, curr));
+        currentMin = exp;
         showCircles();
-        speakersValueMin.text(this.value);
+        speakersValueMin.text(exp);
       });
 
       sliderMax.on("input", function (e) {
-        currentMax = Number(e.target.value);
+        const curr = Number(e.target.value);
+        const exp = curr === 0 ? 0 : Math.ceil(Math.pow(2, curr));
+        currentMax = exp;
         showCircles();
-        speakersValueMax.text(this.value);
+        speakersValueMax.text(exp);
       });
 
     }
